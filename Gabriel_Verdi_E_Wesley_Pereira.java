@@ -10,6 +10,9 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
   public static final int IF	 = 304;
   public static final int FI	 = 305;
   public static final int ELSE = 306;
+  public static final int INT = 307;
+  public static final int DOUBLE = 308;
+  public static final int BOOLEAN = 309;
 
     public static final String tokenList[] = 
       {"IDENT",
@@ -17,7 +20,10 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 		 "WHILE", 
 		 "IF", 
 		 "FI",
-		 "ELSE"  };
+		 "ELSE",
+       "INT",
+       "DOUBLE",
+       "BOOLEAN"  };
                                       
   /* referencia ao objeto Scanner gerado pelo JFLEX */
   private Yylex lexer;
@@ -85,13 +91,26 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     */
 
   private void Prog() {
-      if (laToken == '{') {
-         if (debug) System.out.println("Prog --> Bloco");
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
+         if (debug) System.out.println("Prog --> ListDec1 Bloco");
          Bloco();
       }
       else 
-        yyerror("esperado '{'");
+        yyerror("esperado int, double, boolean, ou {");
    }
+
+   private ListaDeclaVar() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
+         DeclaVar();
+         ListaDeclaVar();
+      }
+     }
+
+     orivate void DeclVar() {
+      Tipo();
+      ListaIdent();
+      verifica(';');
+     }
 
   private void Bloco() {
       if (debug) System.out.println("Bloco --> { Cmd }");
