@@ -76,6 +76,7 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     * 
     * RestoIf -> else Cmd
     *          |
+    *
     * E --> E + T
     *     | E - T
     *     | T
@@ -99,21 +100,34 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
         yyerror("esperado int, double, boolean, ou {");
    }
 
-   private ListaDeclaVar() {
+   private ListaDec1() {
       if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
          DeclaVar();
-         ListaDeclaVar();
+         ListaDec1();
       }
      }
 
-     orivate void DeclVar() {
+     private void DeclVar() {
       Tipo();
       ListaIdent();
       verifica(';');
      }
 
+     private void DeclFunc() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
+         tipoOuVoid();
+         
+         DeclFunc();
+      }
+     }
+
+     private void tipoOuVoid() {
+      Tipo();
+      void();
+     }
+
   private void Bloco() {
-      if (debug) System.out.println("Bloco --> { Cmd }");
+      if (debug) System.out.println("Bloco --> { ListaCmd }");
       //if (laToken == '{') {
          verifica('{');
          Cmd();
@@ -203,15 +217,15 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 
   private void T() {
       if (laToken == IDENT) {
-         if (debug) System.out.println("T --> IDENT");
+         if (debug) System.out.println("F --> IDENT");
          verifica(IDENT);
 	   }
       else if (laToken == NUM) {
-         if (debug) System.out.println("T --> NUM");
+         if (debug) System.out.println("F --> NUM");
          verifica(NUM);
 	   }
       else if (laToken == '(') {
-         if (debug) System.out.println("T --> ( E )");
+         if (debug) System.out.println("F --> ( E )");
          verifica('(');
          E();        
 		 verifica(')');
