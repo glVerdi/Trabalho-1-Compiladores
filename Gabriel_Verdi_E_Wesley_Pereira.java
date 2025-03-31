@@ -13,6 +13,8 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
   public static final int INT = 307;
   public static final int DOUBLE = 308;
   public static final int BOOLEAN = 309;
+   public static final int FUNC = 310;
+   public static final int VOID = 311;
 
     public static final String tokenList[] = 
       {"IDENT",
@@ -23,7 +25,9 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 		 "ELSE",
        "INT",
        "DOUBLE",
-       "BOOLEAN"  };
+       "BOOLEAN",
+       "FUNC",
+       "VOID" };
                                       
   /* referencia ao objeto Scanner gerado pelo JFLEX */
   private Yylex lexer;
@@ -91,21 +95,26 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     * 
     */
 
-  private void Prog() {
-      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
-         if (debug) System.out.println("Prog --> ListDec1 Bloco");
-         Bloco();
+    private void Prog() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || IDENT == '{') {
+          if (debug) System.out.println("Prog --> ListaDec1");
+          ListaDec1(); 
+          Bloco(); 
       }
-      else 
-        yyerror("esperado int, double, boolean, ou {");
-   }
+      else {
+          yyerror("Esperado tipo (int, double, boolean) ou {");
+      }
+  }
 
-   private ListaDec1() {
-      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
-         DeclaVar();
-         ListaDec1();
+   private void ListaDec1() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || laToken == '{') {
+          DeclVar();
+          ListaDec1();
+      } else if (laToken == IDENT) {
+          DeclFunc();
+          ListaDec1();
       }
-     }
+  }
 
      private void DeclVar() {
       Tipo();
@@ -113,27 +122,95 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
       verifica(';');
      }
 
-     private void DeclFunc() {
-      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN || '{') {
-         tipoOuVoid();
-         
-         DeclFunc();
+     private void Tipo() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN) {
+         verifica(laToken);
+      } else {
+         yyerror("Esperado int, double ou boolean");
       }
      }
 
-     private void tipoOuVoid() {
-      Tipo();
-      void();
+     private void ListaIdent() {
+      verifica(IDENT);
+      if (laToken == ',') {
+         verifica(',');
+         ListaIdent();
+      }
      }
+
+     private void DeclFunc() {
+      if (laToken == FUNC) {
+         verifica(FUNC);
+         tipoOuVoid();
+         verifica(IDENT);
+         verifica('(');
+         FormalPar();
+         verifica(')');
+         verifica('{');
+         ListaDec1();
+         ListaCmd();
+         verifica('}');
+         DeclFunc();
+     }
+   }
+
+   private void tipoOuVoid() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN) {
+         Tipo();
+      } else if (laToken == VOID) {
+         verifica(VOID);
+      } else {
+         yyerror("Esperado int, double, boolean ou void");
+      }
+   }
+
+   private void FormalPar() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN) {
+         Tipo();
+         verifica(IDENT);
+         if (laToken == ',') {
+            verifica(',');
+            FormalPar();
+         }
+      } else if (laToken == ')') {
+         // aceita como vazio  <-- my way
+         // ou testar o follow de FormalPar
+      } else {
+         yyerror("Esperado int, double, boolean ou )");
+      }
+   }
+
+   private void paramList() {
+      if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN) {
+         Tipo();
+         verifica(IDENT);
+         if (laToken == ',') {
+            verifica(',');
+            paramList();
+         }
+      } else if (laToken == ')') {
+         // aceita como vazio  <-- my way
+         // ou testar o follow de paramList
+      } else {
+         yyerror("Esperado int, double, boolean ou )");
+      }
+   }
 
   private void Bloco() {
       if (debug) System.out.println("Bloco --> { ListaCmd }");
       //if (laToken == '{') {
          verifica('{');
-         Cmd();
+         ListaCmd();
          verifica('}');
       //}
   }
+
+  private void ListaCmd() {
+   if (laToken == IDENT || laToken == WHILE || laToken == IF || laToken == '{') {
+       Cmd(); 
+       ListaCmd(); 
+   }
+}
 
   private void Cmd() {
       if (laToken == '{') {
@@ -211,9 +288,6 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
          // ou testar o follow de R
          }
    }  
-
-
-
 
   private void T() {
       if (laToken == IDENT) {
