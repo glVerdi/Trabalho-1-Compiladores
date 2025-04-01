@@ -13,8 +13,8 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
   public static final int INT = 307;
   public static final int DOUBLE = 308;
   public static final int BOOLEAN = 309;
-   public static final int FUNC = 310;
-   public static final int VOID = 311;
+  public static final int FUNC = 310;
+  public static final int VOID = 311;
 
     public static final String tokenList[] = 
       {"IDENT",
@@ -43,7 +43,7 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
       lexer = new Yylex (r, this);
   }
 
-     /* Gramática do Trabalho
+   /* Gramática do Trabalho
     * Prog --> ListaDec1
     * 
     * ListaDec1 --> DeclVar ListaDec1
@@ -81,12 +81,12 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     * RestoIf -> else Cmd
     *          |
     *
-    * E --> E + T
-    *     | E - T
-    *     | T
+    * E --> E + T             Sem recursão a esquerda
+    *     | E - T             E --> T E'
+    *     | T                 E' --> + T E' | - T E' |  (*vazio*)
     * 
-    * T --> T * F
-    *     | T / F
+    * T --> T * F             T --> F T'
+    *     | T / F             T' --> * F T' | / F T' |  (*vazio*)
     *     | F
     * 
     * F --> IDENT
@@ -261,35 +261,59 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 
    private void E() {
          if (laToken == IDENT || laToken == NUM || laToken == '(') {
-          if (debug) System.out.println("E --> T R");
+          if (debug) System.out.println("E --> T E'");
          T();
-         R();
+         Elinha();
          }
          else yyerror("Esperado operando (, identificador ou numero");
       }
-      
 
-   private void R() {
+   private void Elinha() {
       if (laToken == '+') {
-         if (debug) System.out.println("R --> + T R");
+         if (debug) System.out.println("E' --> + T E'");
          verifica('+');
          T();
-         R();
+         Elinha();
       }
-      else   if (laToken == '-') {
-         if (debug) System.out.println("R --> - T R");
+      else if (laToken == '-') {
+         if (debug) System.out.println("E' --> - T E'");
          verifica('-');
          T();
-         R();
+         Elinha();
       }
       else {
-         if (debug) System.out.println("R -->  (*vazio*)  ");
-         // aceitar como vazio  <-- my way
-         // ou testar o follow de R
+         if (debug) System.out.println("E' -->  (*vazio*)  ");
          }
-   }  
+   }
 
-  private void T() {
+   private void T() {
+      if (laToken == IDENT || laToken == NUM || laToken == '(') {
+       if (debug) System.out.println("T --> F T'");
+      F();
+      Tlinha();
+      }
+      else yyerror("Esperado operando (, identificador ou numero");
+   }
+
+private void Tlinha() {
+   if (laToken == '*') {
+      if (debug) System.out.println("T' --> * F T'");
+      verifica('*');
+      F();
+      Tlinha();
+   }
+   else if (laToken == '/') {
+      if (debug) System.out.println("T' --> / F T'");
+      verifica('/');
+      F();
+      Tlinha();
+   }
+   else {
+      if (debug) System.out.println("E' -->  (*vazio*)  ");
+      }
+}
+
+  private void F() {
       if (laToken == IDENT) {
          if (debug) System.out.println("F --> IDENT");
          verifica(IDENT);
