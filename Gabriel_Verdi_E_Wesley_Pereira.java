@@ -180,6 +180,7 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
             FormalPar();
          }
       } else if (laToken == ')') {
+         if (debug) System.out.println("FormalPar -->  (*vazio*)  ");
       } else {
          yyerror("Esperado int, double, boolean ou )");
       }
@@ -223,7 +224,7 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 	   }    
       else if (laToken == WHILE) {
          if (debug) System.out.println("Cmd --> WHILE ( E ) Cmd");
-         verifica(WHILE);    // laToken = this.yylex(); 
+         verifica(WHILE);    
   		   verifica('(');
   		   E();
          verifica(')');
@@ -330,7 +331,7 @@ private void Tlinha() {
          if (debug) System.out.println("F --> ( E )");
          verifica('(');
          E();        
-		 verifica(')');
+		   verifica(')');
 	   }
  	else yyerror("Esperado operando (, identificador ou numero");
    }
