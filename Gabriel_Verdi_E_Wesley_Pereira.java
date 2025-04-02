@@ -55,9 +55,11 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     * 
     * Tipo --> int | double | boolean
     * 
-    * ListaIdent --> IDENT , ListaIdent
-    *              | IDENT
-    * 
+    * ListaIdent --> IDENT , ListaIdent        Tirando a ambiguidade
+    *              | IDENT                     ListaIdent --> IDENT ListaIdentResto
+    *                                          ListaIdentResto --> , ListaIdent 
+    *                                                            | vazio
+    *
     * DeclFun --> FUNC tipoOuVoid IDENT '(' FormalPar ')' '{' DeclVar ListaCmd '}' DeclFun
     *           |
     * 
@@ -65,9 +67,10 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     * 
     * FormalPar -> paramList |
     * 
-    * paramList --> Tipo IDENT , ParamList
-    *             | Tipo IDENT
-    * 
+    * paramList --> Tipo IDENT , ParamList     Tirandoo a ambiguidade
+    *             | Tipo IDENT                 paramlist --> Tipo IDENT paramListResto
+    *                                          paramListResto --> , paramList 
+                                                              | vazio
     * Bloco --> { ListaCmd }
     * 
     * ListaCmd --> Cmd ListaCmd
@@ -81,7 +84,7 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     * RestoIf -> else Cmd
     *          |
     *
-    * E --> E + T             Sem recursão a esquerda
+    * E --> E + T             Fatoração a esquerda
     *     | E - T             E --> T E'
     *     | T                 E' --> + T E' | - T E' |  (*vazio*)
     * 
@@ -120,7 +123,7 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
       Tipo();
       ListaIdent();
       verifica(';');
-     }
+   }
 
      private void Tipo() {
       if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN) {
@@ -128,15 +131,19 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
       } else {
          yyerror("Esperado int, double ou boolean");
       }
-     }
+   }
 
      private void ListaIdent() {
-      verifica(IDENT);
+      verifica(IDENT);  
+      ListaIdentResto();  
+   }
+  
+    private void ListaIdentResto() {
       if (laToken == ',') {
-         verifica(',');
-         ListaIdent();
+          verifica(',');  
+          ListaIdent();   
       }
-     }
+   }
 
      private void DeclFunc() {
       if (laToken == FUNC) {
@@ -173,8 +180,6 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
             FormalPar();
          }
       } else if (laToken == ')') {
-         // aceita como vazio  <-- my way
-         // ou testar o follow de FormalPar
       } else {
          yyerror("Esperado int, double, boolean ou )");
       }
@@ -182,20 +187,19 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 
    private void paramList() {
       if (laToken == INT || laToken == DOUBLE || laToken == BOOLEAN) {
-         Tipo();
-         verifica(IDENT);
-         if (laToken == ',') {
-            verifica(',');
-            paramList();
-         }
-      } else if (laToken == ')') {
-         // aceita como vazio  <-- my way
-         // ou testar o follow de paramList
-      } else {
-         yyerror("Esperado int, double, boolean ou )");
+          Tipo(); 
+          verifica(IDENT);  
+          paramListResto();  
       }
-   }
-
+  }
+  
+  private void paramListResto() {
+      if (laToken == ',') {
+          verifica(',');  
+          paramList();   
+      }
+  }
+  
   private void Bloco() {
       if (debug) System.out.println("Bloco --> { ListaCmd }");
       //if (laToken == '{') {
