@@ -302,13 +302,13 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 
 private void S() {
    if (laToken == '*') {
-      if (debug) System.out.println("T' --> * F S");
+      if (debug) System.out.println("S --> * F S");
       verifica('*');
       F();
       S();
    }
    else if (laToken == '/') {
-      if (debug) System.out.println("T' --> / F S");
+      if (debug) System.out.println("S --> / F S");
       verifica('/');
       F();
       S();
