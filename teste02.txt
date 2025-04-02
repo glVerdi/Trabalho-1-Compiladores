@@ -1,4 +1,9 @@
 $TRACE_ON
-    { a = ((( 34 ))); }
+    { 
+        func int soma(int a, int b) {
+        return a + b;
+        }
+
+    }
 
 

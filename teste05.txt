@@ -1,13 +1,9 @@
 $TRACE_ON
 
-    { while (b) 
-        if (c) {
-            {
-                while( true )
-                    if (a)  b=1; else b=7; fi
-            }
-        } 
-        fi
+    { 
+        func void erroFunc() {
+            
+        }
     }
 
 
