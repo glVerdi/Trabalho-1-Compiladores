@@ -85,11 +85,11 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
     *          |
     *
     * E --> E + T             Fatoração a esquerda
-    *     | E - T             E --> T E'
-    *     | T                 E' --> + T E' | - T E' |  (*vazio*)
+    *     | E - T             E --> T R
+    *     | T                 R --> + T R | - T R |  (*vazio*)
     * 
-    * T --> T * F             T --> F T'
-    *     | T / F             T' --> * F T' | / F T' |  (*vazio*)
+    * T --> T * F             T --> F S
+    *     | T / F             S --> * F S | / F S |  (*vazio*)
     *     | F
     * 
     * F --> IDENT
@@ -266,55 +266,55 @@ public class Gabriel_Verdi_E_Wesley_Pereira {
 
    private void E() {
          if (laToken == IDENT || laToken == NUM || laToken == '(') {
-          if (debug) System.out.println("E --> T E'");
+          if (debug) System.out.println("E --> T R");
          T();
-         Elinha();
+         R();
          }
          else yyerror("Esperado operando (, identificador ou numero");
       }
 
-   private void Elinha() {
+   private void R() {
       if (laToken == '+') {
-         if (debug) System.out.println("E' --> + T E'");
+         if (debug) System.out.println("R --> + T R");
          verifica('+');
          T();
-         Elinha();
+         R();
       }
       else if (laToken == '-') {
-         if (debug) System.out.println("E' --> - T E'");
+         if (debug) System.out.println("R --> - T R");
          verifica('-');
          T();
-         Elinha();
+         R();
       }
       else {
-         if (debug) System.out.println("E' -->  (*vazio*)  ");
+         if (debug) System.out.println("R -->  (*vazio*)  ");
          }
    }
 
    private void T() {
       if (laToken == IDENT || laToken == NUM || laToken == '(') {
-       if (debug) System.out.println("T --> F T'");
+       if (debug) System.out.println("T --> F S");
       F();
-      Tlinha();
+      S();
       }
       else yyerror("Esperado operando (, identificador ou numero");
    }
 
-private void Tlinha() {
+private void S() {
    if (laToken == '*') {
-      if (debug) System.out.println("T' --> * F T'");
+      if (debug) System.out.println("T' --> * F S");
       verifica('*');
       F();
-      Tlinha();
+      S();
    }
    else if (laToken == '/') {
-      if (debug) System.out.println("T' --> / F T'");
+      if (debug) System.out.println("T' --> / F S");
       verifica('/');
       F();
-      Tlinha();
+      S();
    }
    else {
-      if (debug) System.out.println("E' -->  (*vazio*)  ");
+      if (debug) System.out.println("S -->  (*vazio*)  ");
       }
 }
 
